@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#ef4444">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <title>Clostyle - Monte Seus Looks</title>
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiQ2xvc3R5bGUiLCJzaG9ydF9uYW1lIjoiQ2xvc3R5bGUiLCJzdGFydF91cmwiOiIuLyIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwiYmFja2dyb3VuZF9jb2xvciI6IiNmZmZmZmYiLCJ0aGVtZV9jb2xvciI6IiNlZjQ0NDQiLCJpY29ucyI6W3sic3JjIjoiZGF0YTppbWFnZS9zdmcreG1sO2Jhc2U2NCxQSE4yWnlCNGJXeHVjejBpYUhSMGNEb3ZMM2QzZHk1M00zUnZjbWN2TWpBd01DOXpkbWNpSUhacFpYZENiM2c5SWpBZ01DQXlOQ0F5TkNJK1BIQmhkR2dnWkQwaWJURTBMamd5SURNeExqVTNZeTQwTVMwdU1qVWdMakU0TFM0NU5pQXVNVGd0TGprMllpMHVNakV0TGpZekxTNDBPUzB4TGprNUxTNDBPUzB4TGprNWN5MHVOamd1TXpFdE1TNDVPUzQwT1MweExqazVMak01TGpjNElpQm1hV3hzUFNJalpXWTBORFEwSWlBdlBqeHdZWFJvSUdROUltMHhNUzQ0TVNBeU1XTXROUzQxSURBdE9TNDVPUzQwTlMwMExqVXlPQzQwTlMwMExqVTJMalEwTGpReElDNDBNU0F4TGpBekxTNDJOU0F4TGpBekxTNDJOV3d1TnprdE5TNDJOSEkwTGpBM0xTNDBNeTB1TlRndU9ETXVPUzAxTGprMllpNDNOaTB1TmprdU56UXROUzR6Tmk1TXpTMHhNUzQ0TVNJZ1ptbHNiRDBpSTJabU5qWTJOaUlnTHo0OEwzTjJaejQ9IiwidHlwZSI6ImltYWdlL3N2Zyt4bWwiLCJzaXplcyI6IjI0eDI0In1dfQ==">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: white;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        .mobile-safe {
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        .btn-touch {
+            min-height: 44px;
+            min-width: 44px;
+        }
+
+        .scan-animation {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e5e7eb;
+            padding: 8px 0;
+            padding-bottom: env(safe-area-inset-bottom);
+            z-index: 50;
+        }
+
+        .content-with-nav {
+            padding-bottom: 80px;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px;
+            color: #6b7280;
+            transition: all 0.2s;
+        }
+
+        .nav-item.active {
+            color: #ef4444;
+        }
+
+        .nav-item i {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        .nav-item span {
+            font-size: 10px;
+            font-weight: 500;
+        }
+
+        #scanner-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 100;
+        }
+
+        #video-feed {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .scan-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 200px;
+            height: 200px;
+            margin-left: -100px;
+            margin-top: -100px;
+            border: 3px solid #ef4444;
+            border-radius: 12px;
+            animation: scanPulse 2s infinite;
+        }
+
+        @keyframes scanPulse {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.05); }
+        }
+
+        /* CORREÇÃO: Botão flutuante com z-index maior e posição ajustada */
+        .floating-btn {
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            border: none;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4);
+            animation: pulse 2s infinite;
+            z-index: 999; /* Z-index muito alto para garantir que fique acima de tudo */
+            cursor: pointer;
+            /* Garantir que seja clicável em dispositivos touch */
+            -webkit-tap-highlight-color: rgba(239, 68, 68, 0.3);
+            touch-action: manipulation;
+        }
+
+        .floating-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 12px 30px rgba(239, 68, 68, 0.5);
+        }
+
+        .floating-btn:active {
+            transform: scale(0.95);
+        }
+
+        .outfit-card {
+            background: linear-gradient(135deg, #fef2f2, #fee2e2);
+            border: 1px solid #fca5a5;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .outfit-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #ef4444, #f87171);
+        }
+
+        .weather-badge {
+            position: absolute;
+            top: 50px;
+            right: 23px;
+            background: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 4px 2px;
+            border-radius: 20px;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            z-index: 10;
+        }
+
+        .wardrobe-item {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid #f3f4f6;
+            position: relative;
+            transition: all 0.2s;
+        }
+
+        .wardrobe-item:active {
+            transform: scale(0.98);
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px 20px 0 0;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            max-height: 80vh;
+            padding: 20px;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-content.show {
+            transform: translateY(0);
+        }
+
+        .swipe-indicator {
+            width: 40px;
+            height: 4px;
+            background: #d1d5db;
+            border-radius: 2px;
+            margin: 0 auto 20px;
+        }
+
+        /* Canvas escondido para captura de cor */
+        #canvas {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 mobile-safe">
+
+    <!-- Canvas escondido para captura de cor -->
+    <canvas id="canvas" style="display: none;"></canvas>
+
+    <div class="content-with-nav">
+        <!-- Header -->
+        <header class="bg-white shadow-sm px-4 py-6 sticky top-0 z-30">
+            <div class="flex items-center justify-center">
+                <div class="w-10 h-10 bg-gradient-to-r from-red-500 to-red-600 rounded-xl flex items-center justify-center mr-3">
+                    <i class="fas fa-tshirt text-white"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-gray-800">Clostyle</h1>
+            </div>
+        </header>
+
+        <!-- Clima -->
+        <div class="px-4 py-3 bg-blue-50 border-b">
+            <div class="flex items-center justify-center text-blue-800">
+                <i class="fas fa-temperature-half mr-2"></i>
+                <span class="text-sm font-medium">Hoje: <strong id="current-weather">22°C, Ensolarado</strong></span>
+            </div>
+        </div>
+        
+        <!-- Conteúdo Principal -->
+        <div class="px-4">
+            
+            <!-- Looks Sugeridos -->
+            <div id="content-looks" class="tab-content py-4">
+                <h2 class="text-lg font-bold text-gray-800 mb-4">Looks para Hoje</h2>
+                <div id="outfit-list" class="space-y-4">
+                    <!-- Gerados dinamicamente -->
+                </div>
+            </div>
+
+            <!-- Guarda-roupa -->
+            <div id="content-wardrobe" class="tab-content py-4 hidden">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-bold text-gray-800">Meu Guarda-Roupa</h2>
+                </div>
+                <div id="wardrobe-list" class="grid grid-cols-2 gap-3 mb-4">
+                    <!-- Carregado dinamicamente -->
+                </div>
+                <div id="empty-wardrobe" class="text-center py-12 text-gray-500 hidden">
+                    <i class="fas fa-tshirt text-4xl mb-4 opacity-30"></i>
+                    <p class="text-sm">Seu guarda-roupa está vazio</p>
+                    <p class="text-xs text-gray-400 mt-2">Toque no botão + para adicionar roupas</p>
+                </div>
+            </div>
+
+            <!-- Perfil -->
+            <div id="content-profile" class="tab-content py-4 hidden">
+                <h2 class="text-lg font-bold text-gray-800 mb-4">Perfil de Estilo</h2>
+                
+                <div class="bg-white rounded-2xl p-4 space-y-4 shadow-sm">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Estilo Principal</label>
+                        <select id="style-select" class="w-full p-3 border border-gray-300 rounded-lg">
+                            <option>Clássico</option>
+                            <option>Casual</option>
+                            <option>Moderno</option>
+                            <option>Streetwear</option>
+                            <option>Boho</option>
+                            <option>Minimalista</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Cores Favoritas</label>
+                        <div class="flex flex-wrap gap-3">
+                            <button class="color-btn w-10 h-10 bg-blue-500 rounded-full border-2 border-white shadow-md btn-touch" data-color="blue"></button>
+                            <button class="color-btn w-10 h-10 bg-gray-800 rounded-full border-2 border-white shadow-md btn-touch" data-color="black"></button>
+                            <button class="color-btn w-10 h-10 bg-white rounded-full border-2 border-gray-300 shadow-md btn-touch" data-color="white"></button>
+                            <button class="color-btn w-10 h-10 bg-red-500 rounded-full border-2 border-white shadow-md btn-touch" data-color="red"></button>
+                            <button class="color-btn w-10 h-10 bg-green-500 rounded-full border-2 border-white shadow-md btn-touch" data-color="green"></button>
+                            <button class="color-btn w-10 h-10 bg-purple-500 rounded-full border-2 border-white shadow-md btn-touch" data-color="purple"></button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Ocasiões Frequentes</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <label class="flex items-center p-3 bg-gray-50 rounded-lg">
+                                <input type="checkbox" class="mr-2 text-red-600 occasion-checkbox" value="trabalho">
+                                <span class="text-sm">Trabalho</span>
+                            </label>
+                            <label class="flex items-center p-3 bg-gray-50 rounded-lg">
+                                <input type="checkbox" class="mr-2 text-red-600 occasion-checkbox" value="casual">
+                                <span class="text-sm">Casual</span>
+                            </label>
+                            <label class="flex items-center p-3 bg-gray-50 rounded-lg">
+                                <input type="checkbox" class="mr-2 text-red-600 occasion-checkbox" value="eventos">
+                                <span class="text-sm">Eventos</span>
+                            </label>
+                            <label class="flex items-center p-3 bg-gray-50 rounded-lg">
+                                <input type="checkbox" class="mr-2 text-red-600 occasion-checkbox" value="esporte">
+                                <span class="text-sm">Esporte</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Temperatura Média</label>
+                        <input type="range" id="temp-slider" min="10" max="35" value="22" class="w-full h-2 bg-red-100 rounded-lg">
+                        <div class="flex justify-between text-xs text-gray-500 mt-1">
+                            <span>10°C</span>
+                            <span>35°C</span>
+                        </div>
+                    </div>
+
+                    <button id="save-profile" class="w-full bg-gradient-to-r from-red-500 to-red-600 text-white py-3 rounded-lg font-medium btn-touch">
+                        Salvar Perfil
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Navegação Bottom -->
+    <div class="bottom-nav">
+        <div class="flex justify-around">
+            <button id="nav-looks" class="nav-item active">
+                <i class="fas fa-home"></i>
+                <span>Looks</span>
+            </button>
+            <button id="nav-wardrobe" class="nav-item">
+                <i class="fas fa-tshirt"></i>
+                <span>Roupas</span>
+            </button>
+            <button id="nav-profile" class="nav-item">
+                <i class="fas fa-user"></i>
+                <span>Perfil</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Botão Flutuante para Escanear (CORRIGIDO) -->
+    <button id="scan-btn" class="floating-btn" type="button">
+        <i class="fas fa-plus"></i>
+    </button>
+
+    <!-- Modal de Escaneamento -->
+    <div id="scanner-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80">
+        <div class="relative w-full max-w-md mx-4">
+            <!-- Video Feed -->
+            <video id="video-feed" autoplay playsinline class="w-full h-96 rounded-xl object-cover border-4 border-red-500"></video>
+
+            <!-- Overlay de escaneamento -->
+            <div class="scan-overlay absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-48 h-48 border-4 border-red-500 rounded-lg animate-pulse"></div>
+
+            <!-- Controles -->
+            <div class="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 to-transparent">
+                <button id="close-scanner" class="absolute top-4 right-4 w-10 h-10 bg-white/20 rounded-full flex items-center justify-center text-white">
+                    <i class="fas fa-times"></i>
+                </button>
+                <div class="flex gap-2">
+                    <button id="capture-btn" class="flex-1 bg-red-500 text-white py-4 rounded-xl font-medium text-lg">
+                        <i class="fas fa-camera mr-2"></i>Capturar
+                    </button>
+                    <button id="manual-btn" class="flex-1 bg-blue-500 text-white py-4 rounded-xl font-medium text-lg">
+                        <i class="fas fa-plus mr-2"></i>Manual
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Adição Manual -->
+    <div id="manual-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+        <div class="bg-white rounded-2xl p-6 mx-4 w-full max-w-sm">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold text-gray-800">Adicionar Peça</h3>
+                <button id="close-manual" class="w-8 h-8 text-gray-500 flex items-center justify-center">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Nome da Peça</label>
+                    <input type="text" id="item-name" placeholder="Ex: Camiseta, Calça jeans..." class="w-full p-3 border border-gray-300 rounded-lg">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Tipo</label>
+                    <select id="item-type" class="w-full p-3 border border-gray-300 rounded-lg">
+                        <option value="camiseta">Camiseta</option>
+                        <option value="camisa">Camisa</option>
+                        <option value="calca">Calça</option>
+                        <option value="bermuda">Bermuda</option>
+                        <option value="jaqueta">Jaqueta</option>
+                        <option value="moletom">Moletom</option>
+                        <option value="vestido">Vestido</option>
+                        <option value="saia">Saia</option>
+                        <option value="sapato">Sapato</option>
+                        <option value="tenis">Tênis</option>
+                        <option value="sandalia">Sandália</option>
+                        <option value="acessorio">Acessório</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Cor</label>
+                    <div class="grid grid-cols-4 gap-3 mb-3">
+                        <button class="color-option w-12 h-12 bg-red-500 rounded-lg border-2 border-gray-200 btn-touch" data-color="Vermelha"></button>
+                        <button class="color-option w-12 h-12 bg-blue-500 rounded-lg border-2 border-gray-200 btn-touch" data-color="Azul"></button>
+                        <button class="color-option w-12 h-12 bg-green-500 rounded-lg border-2 border-gray-200 btn-touch" data-color="Verde"></button>
+                        <button class="color-option w-12 h-12 bg-yellow-400 rounded-lg border-2 border-gray-200 btn-touch" data-color="Amarela"></button>
+                        <button class="color-option w-12 h-12 bg-purple-500 rounded-lg border-2 border-gray-200 btn-touch" data-color="Roxa"></button>
+                        <button class="color-option w-12 h-12 bg-pink-500 rounded-lg border-2 border-gray-200 btn-touch" data-color="Rosa"></button>
+                        <button class="color-option w-12 h-12 bg-gray-800 rounded-lg border-2 border-gray-200 btn-touch" data-color="Preta"></button>
+                        <button class="color-option w-12 h-12 bg-white rounded-lg border-2 border-gray-300 btn-touch" data-color="Branca"></button>
+                        <button class="color-option w-12 h-12 bg-gray-500 rounded-lg border-2 border-gray-200 btn-touch" data-color="Cinza"></button>
+                        <button class="color-option w-12 h-12 bg-orange-500 rounded-lg border-2 border-gray-200 btn-touch" data-color="Laranja"></button>
+                        <button class="color-option w-12 h-12 bg-amber-700 rounded-lg border-2 border-gray-200 btn-touch" data-color="Marrom"></button>
+                        <button class="color-option w-12 h-12 bg-gradient-to-r from-red-400 to-purple-500 rounded-lg border-2 border-gray-200 btn-touch" data-color="Colorida"></button>
+                    </div>
+                    <input type="text" id="custom-color" placeholder="Ou digite uma cor personalizada..." class="w-full p-2 border border-gray-300 rounded-lg text-sm">
+                </div>
+
+                <button id="add-item" class="w-full bg-gradient-to-r from-red-500 to-red-600 text-white py-3 rounded-lg font-medium btn-touch">
+                    <i class="fas fa-plus mr-2"></i>Adicionar ao Guarda-Roupa
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Configuração PWA ---
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('data:text/javascript;base64,' + btoa(`
+                self.addEventListener('install', e => e.waitUntil(caches.open('clostyle-v1').then(cache => cache.addAll(['/']))));
+                self.addEventListener('fetch', e => e.respondWith(caches.match(e.request).then(r => r || fetch(e.request))));
+            `));
+        }
+
+        // --- Dados ---
+        let wardrobe = [];
+        let profile = {
+            style: 'Clássico',
+            colors: ['red', 'blue'],
+            occasions: ['trabalho', 'casual'],
+            temperature: 22
+        };
+
+        // Tentar carregar dados do localStorage (compatível com navegadores que não suportam)
+        try {
+            wardrobe = JSON.parse(localStorage.getItem('clostyle-wardrobe')) || [];
+            profile = JSON.parse(localStorage.getItem('clostyle-profile')) || profile;
+        } catch (e) {
+            console.log('LocalStorage não disponível, usando dados em memória');
+        }
+
+        // --- Elementos ---
+        const wardrobeList = document.getElementById('wardrobe-list');
+        const emptyMsg = document.getElementById('empty-wardrobe');
+        const outfitList = document.getElementById('outfit-list');
+
+        // --- Navegação ---
+        document.querySelectorAll('[id^="nav-"]').forEach(nav => {
+            nav.addEventListener('click', (e) => {
+                e.preventDefault();
+                
+                // Remove active de todos
+                document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+                nav.classList.add('active');
+                
+                // Esconde todos os conteúdos
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
+                
+                // Mostra o conteúdo correto
+                const target = nav.id.replace('nav-', 'content-');
+                document.getElementById(target).classList.remove('hidden');
+                
+                if (target === 'content-looks') generateOutfits();
+            });
+        });
+
+        // --- Perfil ---
+        function loadProfile() {
+            document.getElementById('style-select').value = profile.style;
+            document.getElementById('temp-slider').value = profile.temperature;
+            document.getElementById('current-weather').textContent = `${profile.temperature}°C, Ensolarado`;
+            
+            document.querySelectorAll('.occasion-checkbox').forEach(cb => {
+                cb.checked = profile.occasions.includes(cb.value);
+            });
+            
+            document.querySelectorAll('.color-btn').forEach(btn => {
+                if (profile.colors.includes(btn.dataset.color)) {
+                    btn.style.outline = '3px solid #ef4444';
+                }
+            });
+        }
+
+        loadProfile();
+
+        document.getElementById('save-profile').addEventListener('click', () => {
+            profile.style = document.getElementById('style-select').value;
+            profile.temperature = parseInt(document.getElementById('temp-slider').value);
+            profile.occasions = Array.from(document.querySelectorAll('.occasion-checkbox:checked')).map(cb => cb.value);
+            profile.colors = Array.from(document.querySelectorAll('.color-btn[style*="outline"]')).map(btn => btn.dataset.color);
+            
+            try {
+                localStorage.setItem('clostyle-profile', JSON.stringify(profile));
+            } catch (e) {
+                console.log('Não foi possível salvar no localStorage');
+            }
+            
+            // Feedback visual
+            const btn = document.getElementById('save-profile');
+            const originalText = btn.textContent;
+            btn.textContent = '✓ Salvo!';
+            btn.style.background = '#10b981';
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.style.background = '';
+            }, 2000);
+        });
+
+        document.querySelectorAll('.color-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                if (this.style.outline) {
+                    this.style.outline = '';
+                } else {
+                    this.style.outline = '3px solid #ef4444';
+                }
+            });
+        });
+
+        // --- Guarda-roupa ---
+        function renderWardrobe() {
+            wardrobeList.innerHTML = '';
+            
+            if (wardrobe.length === 0) {
+                emptyMsg.classList.remove('hidden');
+                return;
+            }
+            
+            emptyMsg.classList.add('hidden');
+            
+            wardrobe.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'wardrobe-item';
+                div.innerHTML = `
+                    <div class="flex flex-col items-center text-center">
+                        <div class="w-12 h-12 bg-gradient-to-br from-gray-400 to-gray-600 rounded-xl mb-2 flex items-center justify-center text-white">
+                            <i class="fas fa-tshirt"></i>
+                        </div>
+                        <p class="font-medium text-gray-800 text-sm">${item.name}</p>
+                        <p class="text-xs text-gray-500">${item.color}</p>
+                        <button onclick="removeItem(${index})" class="absolute top-2 right-2 w-6 h-6 text-red-500 flex items-center justify-center">
+                            <i class="fas fa-times text-xs"></i>
+                        </button>
+                    </div>
+                `;
+                wardrobeList.appendChild(div);
+            });
+        }
+
+        window.removeItem = function(index) {
+            wardrobe.splice(index, 1);
+            try {
+                localStorage.setItem('clostyle-wardrobe', JSON.stringify(wardrobe));
+            } catch (e) {
+                console.log('Não foi possível salvar no localStorage');
+            }
+            renderWardrobe();
+        }
+
+        renderWardrobe();
+
+        // --- Escaneamento (CORRIGIDO) ---
+        const video = document.getElementById('video-feed');
+        const modal = document.getElementById('scanner-modal');
+        const scanBtn = document.getElementById('scan-btn');
+        const closeBtn = document.getElementById('close-scanner');
+        const captureBtn = document.getElementById('capture-btn');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        console.log('Botão de scan encontrado:', scanBtn); // Debug
+
+        // CORREÇÃO: Função para mostrar simulação quando câmera não estiver disponível
+        function showCameraSimulation() {
+            console.log('Mostrando simulação de câmera');
+            modal.classList.remove('hidden');
+        }
+
+        // Função para abrir o modal manual
+        function openManualAdd() {
+            document.getElementById('scanner-modal').classList.add('hidden');
+            document.getElementById('manual-modal').classList.remove('hidden');
+        }
+
+        // Função para fechar modal manual
+        function closeManualModal() {
+            document.getElementById('manual-modal').classList.add('hidden');
+            // Limpar campos
+            document.getElementById('item-name').value = '';
+            document.getElementById('custom-color').value = '';
+            document.querySelectorAll('.color-option').forEach(btn => {
+                btn.style.outline = '';
+            });
+        }
+
+        // Função para abrir a câmera
+        async function openCamera() {
+            try {
+                console.log('Tentando abrir câmera...');
+                
+                // Verifica se getUserMedia está disponível
+                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                    console.log('API de câmera não disponível, usando simulação');
+                    showCameraSimulation();
+                    return;
+                }
+
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        facingMode: 'environment',
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    }
+                });
+
+                video.srcObject = stream;
+                modal.classList.remove('hidden');
+                console.log('Câmera aberta com sucesso');
+            } catch (err) {
+                console.error("Erro ao acessar câmera:", err);
+                
+                if (err.name === "NotAllowedError") {
+                    alert("Permissão para usar a câmera foi negada. Usando modo simulação.");
+                } else if (err.name === "NotFoundError") {
+                    alert("Câmera não encontrada. Usando modo simulação.");
+                } else {
+                    alert("Erro ao acessar a câmera. Usando modo simulação.");
+                }
+                
+                // Usar simulação como fallback
+                showCameraSimulation();
+            }
+        }
+
+        // CORREÇÃO: Event listeners com verificação
+        if (scanBtn) {
+            scanBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Botão de scan clicado!');
+                vibrate([50]); // Feedback tátil
+                openCamera();
+            });
+            
+            // Adicionar também para touch
+            scanBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                console.log('Touch start no botão de scan');
+            });
+            
+            console.log('Event listeners do botão de scan adicionados');
+        } else {
+            console.error('Botão de scan não encontrado!');
+        }
+
+        // Fecha o modal
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                modal.classList.add('hidden');
+                if (video.srcObject) {
+                    video.srcObject.getTracks().forEach(track => track.stop());
+                }
+            });
+        }
+
+        // Botão para adicionar manualmente
+        const manualBtn = document.getElementById('manual-btn');
+        if (manualBtn) {
+            manualBtn.addEventListener('click', () => {
+                openManualAdd();
+            });
+        }
+
+        // Fechar modal manual
+        const closeManual = document.getElementById('close-manual');
+        if (closeManual) {
+            closeManual.addEventListener('click', closeManualModal);
+        }
+
+        // Seleção de cores no modal manual
+        let selectedColor = '';
+        document.querySelectorAll('.color-option').forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Remove seleção de outros botões
+                document.querySelectorAll('.color-option').forEach(b => {
+                    b.style.outline = '';
+                });
+                // Seleciona este botão
+                this.style.outline = '3px solid #ef4444';
+                selectedColor = this.dataset.color;
+                // Limpa campo personalizado
+                document.getElementById('custom-color').value = '';
+            });
+        });
+
+        // Adicionar item manualmente
+        const addItemBtn = document.getElementById('add-item');
+        if (addItemBtn) {
+            addItemBtn.addEventListener('click', () => {
+                const name = document.getElementById('item-name').value.trim();
+                const customColor = document.getElementById('custom-color').value.trim();
+                const finalColor = customColor || selectedColor;
+
+                if (!name) {
+                    alert('Por favor, digite o nome da peça');
+                    return;
+                }
+
+                if (!finalColor) {
+                    alert('Por favor, escolha uma cor');
+                    return;
+                }
+
+                // Adicionar ao guarda-roupa
+                wardrobe.push({ 
+                    name, 
+                    color: finalColor,
+                    type: document.getElementById('item-type').value 
+                });
+                
+                try {
+                    localStorage.setItem('clostyle-wardrobe', JSON.stringify(wardrobe));
+                } catch (e) {
+                    console.log('Não foi possível salvar no localStorage');
+                }
+
+                renderWardrobe();
+                closeManualModal();
+
+                // Feedback visual
+                scanBtn.innerHTML = '<i class="fas fa-check"></i>';
+                setTimeout(() => {
+                    scanBtn.innerHTML = '<i class="fas fa-plus"></i>';
+                }, 2000);
+
+                alert(`Peça "${name}" adicionada com sucesso!`);
+            });
+        }
+
+        // Captura a cor
+        if (captureBtn) {
+            captureBtn.addEventListener('click', () => {
+                // Garante que o vídeo já tenha sido carregado
+                if (!video.srcObject) {
+                    alert("Câmera não pronta. Tente novamente.");
+                    return;
+                }
+
+                canvas.width = 300;
+                canvas.height = 300;
+                ctx.drawImage(video, 0, 0, 300, 300);
+
+                const imageData = ctx.getImageData(150, 150, 1, 1).data;
+                const [r, g, b] = imageData;
+                const color = getClosestColor(r, g, b);
+
+                const name = prompt('Nome da peça:') || 'Nova peça';
+
+                wardrobe.push({ name, color });
+                try {
+                    localStorage.setItem('clostyle-wardrobe', JSON.stringify(wardrobe));
+                } catch (e) {
+                    console.log('Não foi possível salvar no localStorage');
+                }
+
+                modal.classList.add('hidden');
+                if (video.srcObject) {
+                    video.srcObject.getTracks().forEach(track => track.stop());
+                }
+                renderWardrobe();
+
+                // Feedback visual
+                scanBtn.innerHTML = '<i class="fas fa-check"></i>';
+                setTimeout(() => {
+                    scanBtn.innerHTML = '<i class="fas fa-plus"></i>';
+                }, 2000);
+            });
+        }
+
+        function getClosestColor(r, g, b) {
+            const colors = {
+                'Vermelha': [220, 38, 38],
+                'Azul': [37, 99, 235],
+                'Preta': [17, 24, 39],
+                'Branca': [255, 255, 255],
+                'Verde': [22, 163, 74],
+                'Cinza': [107, 114, 128],
+                'Roxa': [147, 51, 234],
+                'Rosa': [236, 72, 153],
+                'Amarela': [245, 158, 11],
+                'Laranja': [249, 115, 22],
+                'Marrom': [165, 42, 42]
+            };
+
+            let minDist = Infinity;
+            let closest = 'Colorida';
+
+            for (const [name, [cr, cg, cb]] of Object.entries(colors)) {
+                const d = Math.sqrt((r-cr)**2 + (g-cg)**2 + (b-cb)**2);
+                if (d < minDist) {
+                    minDist = d;
+                    closest = name;
+                }
+            }
+            return closest;
+        }
+
+        // --- Geração de Looks ---
+        function generateOutfits() {
+            outfitList.innerHTML = '';
+            
+            const temp = profile.temperature;
+            const style = profile.style.toLowerCase();
+            const occasion = profile.occasions[0] || 'casual';
+            
+            const outfitSuggestions = [
+                {
+                    name: temp < 18 ? 'Look de Inverno' : temp > 28 ? 'Look Fresh' : 'Look do Dia',
+                    match: '92%',
+                    temp: temp,
+                    items: generateOutfitItems(temp, style),
+                    tips: generateTips(temp, occasion, style)
+                },
+                {
+                    name: `Look ${style === 'casual' ? 'Descolado' : 'Elegante'}`,
+                    match: '88%',
+                    temp: temp,
+                    items: generateOutfitItems(temp, 'alternativo'),
+                    tips: ['Combinação harmônica', 'Adequado para o clima', 'Seu estilo pessoal']
+                }
+            ];
+            
+            outfitSuggestions.forEach(outfit => {
+                const div = document.createElement('div');
+                div.className = 'outfit-card';
+                div.innerHTML = `
+                    <div class="weather-badge">${outfit.temp}°C</div>
+                    
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="font-bold text-gray-800 text-lg">${outfit.name}</h3>
+                        <span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">${outfit.match}</span>
+                    </div>
+                    
+                    <div class="space-y-3 mb-4">
+                        ${outfit.items.map(item => `
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 bg-gradient-to-br from-gray-300 to-gray-500 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-tshirt text-white text-sm"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="font-medium text-gray-800 text-sm">${item.name}</p>
+                                    <p class="text-xs text-gray-500">${item.color}</p>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <div class="mb-4">
+                        <p class="text-xs font-medium text-gray-600 mb-2">Por que combina:</p>
+                        <div class="flex flex-wrap gap-1">
+                            ${outfit.tips.map(tip => `
+                                <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">${tip}</span>
+                            `).join('')}
+                        </div>
+                    </div>
+                    
+                    <button class="w-full bg-gradient-to-r from-red-500 to-red-600 text-white py-3 rounded-xl font-medium btn-touch">
+                        <i class="fas fa-heart mr-2"></i>Usar Este Look
+                    </button>
+                `;
+                outfitList.appendChild(div);
+            });
+        }
+
+        function generateOutfitItems(temp, style) {
+            const baseItems = [];
+            
+            if (temp < 18) {
+                baseItems.push(
+                    { name: 'Suéter de lã', color: 'Cinza' },
+                    { name: 'Calça jeans', color: 'Azul escuro' },
+                    { name: 'Jaqueta', color: 'Preta' },
+                    { name: 'Bota', color: 'Marrom' }
+                );
+            } else if (temp > 28) {
+                baseItems.push(
+                    { name: 'Camiseta', color: 'Branca' },
+                    { name: 'Bermuda', color: 'Bege' },
+                    { name: 'Tênis', color: 'Branco' }
+                );
+            } else {
+                baseItems.push(
+                    { name: 'Camisa', color: 'Azul' },
+                    { name: 'Calça chino', color: 'Bege' },
+                    { name: 'Sapato casual', color: 'Marrom' }
+                );
+            }
+            
+            return baseItems;
+        }
+
+        function generateTips(temp, occasion, style) {
+            const tips = [];
+            
+            if (temp < 18) tips.push('Aquece bem');
+            else if (temp > 28) tips.push('Ventilado');
+            else tips.push('Confortável');
+            
+            tips.push(`Para ${occasion}`);
+            tips.push(`Estilo ${style}`);
+            
+            return tips;
+        }
+
+        // --- Inicialização ---
+        generateOutfits();
+
+        // --- Vibração para feedback ---
+        function vibrate(pattern = [50]) {
+            if ('vibrate' in navigator) {
+                navigator.vibrate(pattern);
+            }
+        }
+
+        // Adiciona vibração nos botões importantes
+        document.querySelectorAll('.btn-touch').forEach(btn => {
+            btn.addEventListener('click', () => vibrate([30]));
+        });
+
+        // --- Gestos para mobile ---
+        let startY = 0;
+        
+        document.addEventListener('touchstart', (e) => {
+            startY = e.touches[0].clientY;
+        });
+
+        document.addEventListener('touchend', (e) => {
+            const endY = e.changedTouches[0].clientY;
+            const diff = startY - endY;
+            
+            // Swipe up para refresh (mais de 100px)
+            if (diff > 100 && window.scrollY === 0) {
+                generateOutfits();
+                
+                // Feedback visual
+                document.body.style.backgroundColor = '#fee2e2';
+                setTimeout(() => {
+                    document.body.style.backgroundColor = '';
+                }, 300);
+            }
+        });
+
+        // --- Notificação de instalação PWA ---
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            
+            setTimeout(() => {
+                const install = confirm('Instalar Clostyle no seu celular?');
+                if (install) {
+                    e.prompt();
+                }
+            }, 3000);
+        });
+
+        // --- Modo escuro baseado no sistema ---
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.body.classList.add('dark-mode');
+        }
+
+        // --- Prevenção de zoom ---
+        document.addEventListener('gesturestart', function (e) {
+            e.preventDefault();
+        });
+
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function (event) {
+            const now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+
+        // --- Debug para verificar se tudo foi carregado ---
+        console.log('App Clostyle carregado!');
+        console.log('Botão scan-btn:', document.getElementById('scan-btn'));
+        console.log('Modal scanner:', document.getElementById('scanner-modal'));
+        
+        // Teste do botão (remover depois)
+        const testBtn = document.getElementById('scan-btn');
+        if (testBtn) {
+            console.log('Botão encontrado, adicionando teste de clique');
+            testBtn.style.border = '2px solid yellow'; // Indicador visual temporário
+            setTimeout(() => {
+                testBtn.style.border = 'none';
+            }, 3000);
+        }
+
+    </script>
+</body>
+</html>
